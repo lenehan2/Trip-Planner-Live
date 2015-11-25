@@ -1,4 +1,3 @@
-var map;
 function initialize_gmaps() {
 
   // initialize new google maps LatLng object
@@ -16,7 +15,7 @@ function initialize_gmaps() {
   var map_canvas_obj = document.getElementById('map-canvas');
 
   // initialize a new Google Map with the options
-  map = new google.maps.Map(map_canvas_obj, mapOptions);
+  var map = new google.maps.Map(map_canvas_obj, mapOptions);
 
   // add the marker to the map
   var marker = new google.maps.Marker({
@@ -25,21 +24,15 @@ function initialize_gmaps() {
   });
 
   // draw some locations on the map
-  function drawLocation(location, opts) {
-    if (typeof opts !== 'object') {
-      opts = {};
-    }
-    opts.position = new google.maps.LatLng(location[0], location[1]);
-    opts.map = map;
-    var marker = new google.maps.Marker(opts);
-  }
-
-  // var hotelLocation = [40.705137, -74.007624];
+      var hotelLocation = [];
+      var restaurantLocations = [];
+      var activityLocations = [];
+//   var hotelLocation = [40.705137, -74.007624];
   // var restaurantLocations = [
   //       [40.705137, -74.013940],
   //       [40.708475, -74.010846]
   //     ];
-  // var activityLocations = [
+//   var activityLocations = [
   //       [40.716291, -73.995315],
   //       [40.707119, -74.003602]
   //     ];
@@ -57,11 +50,8 @@ function initialize_gmaps() {
       icon: '/images/star-3.png'
     });
   });
+  return map;
 }
-
-$(document).ready(function() {
-  initialize_gmaps();
-});
 
 var styleArr = [{
   featureType: 'landscape',
@@ -91,3 +81,13 @@ var styleArr = [{
   elementType: 'geometry.fill',
   stylers: [{ color: '#b6c54c' }, { lightness: 40 }, { saturation: -40 }]
 }];
+
+function drawLocation(location, opts) {
+  if (typeof opts !== 'object') {
+    opts = {};
+  }
+  opts.position = new google.maps.LatLng(location[0], location[1]);
+  opts.map = map;
+  var marker = new google.maps.Marker(opts);
+  return marker;
+}

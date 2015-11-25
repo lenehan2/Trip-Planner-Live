@@ -1,39 +1,70 @@
 var markerArray = [];
+var map = initialize_gmaps();
 
-$(".panel-body").on('click','button',function(e){
+
+$("#places-selector").on('click','button',function(e){
+	var $select = $(this).siblings('select');
+	var $list = $('<li></li>');
+	var $div = $("<div class='itinerary-item'></div>");
+	var $span = $("<span class='title'>"+$select.val()+"</span>")
+	var $xbutton = $("<button class='btn btn-xs btn-danger remove btn-circle'>x</button>");
 	
-	var $itineraryElement = $(this).siblings('select');
-	var elementClass = $itineraryElement.attr('class');
-	var $itemToAppend = "<li><div class='itinerary-item'><span class='title'>"+$itineraryElement.val()+"</span><button class='btn btn-xs btn-danger remove btn-circle'>x</button></div></li>";
-	//console.log($itineraryElement.attr("class"));
-	$("ul."+$itineraryElement.attr("class")).append($itemToAppend);
-	//console.log(all_hotels)
+	var elementToAdd = $list.append($div);
+	$div.append($span);
+	$div.append($xbutton);
+	$select.append($list);
+	var elementClass = $select.attr('class');
+	
+	$(".itinerary-active ul."+$select.attr("class")).append(elementToAdd);
 
 	if(elementClass === "hotel"){
-		var latLongArray = searchHelper(all_hotels,$itineraryElement)
+		var latLongArray = searchHelper(all_hotels,$select);
 	}
 	else if(elementClass === "activity"){
-		var latLongArray = searchHelper(all_activities,$itineraryElement);
+		var latLongArray = searchHelper(all_activities,$select);
 	}
 	else if(elementClass === "restaurant"){
-		var latLongArray = searchHelper(all_restaurants,$itineraryElement);
+		var latLongArray = searchHelper(all_restaurants,$select);
 	}
-
 	var latLong = {lat: latLongArray[0], lng: latLongArray[1]};
-    var marker = new google.maps.Marker({position: latLong, map:map});
- //    if(!arraySearch(latLongArray,markerArray)){
-	// 	var idx = markerArray.indexOf(latLongArray);
-	// 	markerArray[idx] = null;
-	// 	marker.setMap(null);
-	// }else{
-	// 	markerArray.push(latLongArray);
-	// }
- console.log(markerArray)
+	
+	var markerinstance = drawLocation(latLongArray);
+	
+	$xbutton.on('click', function(){
+		var $this = $(this);
+		markerinstance.setMap(null);
+		$this.closest('li').remove();
+	});
+  console.log(markerArray)
 });
 
-$("#itinerary").on('click', 'button', function(){
-	//remove
+
+
+$('.day-buttons').delegate('button', 'click', selectDayBtn);
+$('#add-day').on('click', function(){
+	var $this = $(this);
+	var divToAppend = $this.parent();
+	var dayNum = divToAppend.children().length;
+	var $button = $('<button class="btn btn-circle day-btn day-number">'+dayNum+'</button>');
+	var $dayItinerary = $('#itinerary0').clone(true);
+	$('#itinerary-panel').append($dayItinerary);
+
+	$dayItinerary.attr('id',"itinerary"+dayNum);
+	$button.on('click', selectDayBtn);
+	$this.before($button);
 })
+function selectDayBtn(){
+	var $this = $(this);
+	if($this.hasClass('day-number')){
+		$this.siblings().removeClass('current-day');
+		$this.addClass('current-day');
+		
+		var dayNum = $this.text();
+		$('#day-display').text('Day ' + dayNum);
+		$('.itinerary').removeClass('itinerary-active').hide();
+		$('#itinerary'+dayNum).addClass('itinerary-active').show();
+	}
+}
 
 
 var searchHelper = function(list,element){
